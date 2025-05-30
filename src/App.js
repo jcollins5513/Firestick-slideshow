@@ -2,15 +2,15 @@ import React, { useRef, useState } from "react";
 
 const is360Image = (file) => {
   // Heuristic: filename contains '360' or 'pano', or user marks it
-  return /360|pano/i.test(file.name);
+  return file && file.name && /360|pano/i.test(file.name);
 };
 
 const isVideo = (file) => {
-  return file.type.startsWith("video/");
+  return file && file.type && file.type.startsWith("video/");
 };
 
 const isImage = (file) => {
-  return file.type.startsWith("image/");
+  return file && file.type && file.type.startsWith("image/");
 };
 
 function App() {
@@ -25,6 +25,7 @@ function App() {
   const [psv, setPsv] = useState(null);
   const slideshowTimer = useRef(null);
   const viewerRef = useRef();
+  const videoRef = useRef();
   const [newGroupName, setNewGroupName] = useState("");
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
@@ -68,6 +69,14 @@ function App() {
     setNewGroupName("");
     setCurrentIdx(0);
   };
+
+  // Keep selectedGroupIdx in bounds if groups change
+  React.useEffect(() => {
+    if (selectedGroupIdx >= groups.length && groups.length > 0) {
+      setSelectedGroupIdx(groups.length - 1);
+      setCurrentIdx(0);
+    }
+  }, [groups, selectedGroupIdx]);
 
   // Select group
   const selectGroup = (idx) => {
@@ -122,12 +131,28 @@ function App() {
   };
 
 
+  // Slideshow logic: timer for images, wait for video end for videos
   React.useEffect(() => {
     if (!playing || !currentGroup.media.length) return;
-    slideshowTimer.current = setTimeout(() => {
-      next();
-    }, 5000);
-    return () => clearTimeout(slideshowTimer.current);
+    const file = currentGroup.media[currentIdx];
+    if (isVideo(file)) {
+      // For videos, advance on 'ended' event
+      if (videoRef.current) {
+        const handler = () => {
+          if (playing) next();
+        };
+        videoRef.current.addEventListener('ended', handler);
+        return () => {
+          if (videoRef.current) videoRef.current.removeEventListener('ended', handler);
+        };
+      }
+    } else {
+      // For images/360s, advance after 5s
+      slideshowTimer.current = setTimeout(() => {
+        next();
+      }, 5000);
+      return () => clearTimeout(slideshowTimer.current);
+    }
   }, [playing, currentIdx, currentGroup.media]);
 
   React.useEffect(() => {
@@ -164,12 +189,14 @@ function App() {
   const renderMedia = () => {
     if (!currentGroup.media.length) return <div style={{color:'#888'}}>No media in this group</div>;
     const file = currentGroup.media[currentIdx];
+    if (!file) return <div style={{color:'#888'}}>No media selected</div>;
     if (is360Image(file)) {
       return <div ref={viewerRef} style={{ width: "100%", height: "60vh" }} />;
     }
     if (isVideo(file)) {
       return (
         <video
+          ref={videoRef}
           src={URL.createObjectURL(file)}
           controls
           autoPlay={playing}
@@ -240,14 +267,33 @@ function App() {
         </div>
       )}
       {/* Add media to group */}
-      <input
-        type="file"
-        multiple
-        accept="image/*,video/*"
-        onChange={handleFileChange}
-        style={{ marginBottom: 20 }}
-        disabled={groups.length === 0}
-      />
+      {groups.length === 0 ? (
+        <div style={{ color: '#bbb', marginBottom: 20 }}>
+          Create a group to enable media upload.
+        </div>
+      ) : (
+        <div style={{ marginBottom: 20 }}>
+          <label style={{
+            display: 'inline-block',
+            padding: '0.6rem 1.2rem',
+            background: '#333',
+            color: '#fff',
+            borderRadius: 6,
+            cursor: 'pointer',
+            fontSize: '1.1rem',
+            marginRight: 10,
+          }}>
+            + Add Media
+            <input
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+      )}
       <div className="media-viewer">{renderMedia()}</div>
       <div className="controls">
         <button onClick={prev} disabled={currentGroup.media.length === 0}>

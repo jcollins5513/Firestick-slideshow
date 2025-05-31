@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 
 const is360Image = (file) => {
   // Heuristic: filename contains '360' or 'pano', or user marks it
@@ -229,8 +230,10 @@ function App() {
   });
 
   return (
-    <div className="app-container">
-      <h1>Firestick Slideshow</h1>
+    <>
+      <BentleyLogo className="bentley-logo-overlay" />
+      <div className="app-container">
+        <h1>Firestick Slideshow</h1>
       {/* Group selection and management */}
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <select
@@ -320,6 +323,7 @@ function App() {
         Use remote arrows or keyboard (←/→, space) for navigation.
       </div>
     </div>
+    </>
   );
 }
 

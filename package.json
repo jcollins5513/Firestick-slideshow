@@ -10,11 +10,13 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@react-three/drei": "^9.56.15",
+    "@react-three/fiber": "^8.13.7",
     "photo-sphere-viewer": "^4.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "three": "0.125.2"
+    "three": "^0.150.1"
   },
   "browserslist": {
     "production": [

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
+import BillboardScene from "./BillboardScene";
 
 const is360Image = (file) => {
   // Heuristic: filename contains '360' or 'pano', or user marks it
@@ -297,7 +298,9 @@ function App() {
           </label>
         </div>
       )}
-      <div className="media-viewer">{renderMedia()}</div>
+      <div className="media-viewer">
+        <BillboardScene media={currentGroup.media[currentIdx]} />
+      </div>
       <div className="controls">
         <button onClick={prev} disabled={currentGroup.media.length === 0}>
           ⏮ Prev

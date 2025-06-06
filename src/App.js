@@ -121,6 +121,25 @@ function App() {
     setRenaming(false);
   };
 
+  const loadInventory = async () => {
+    try {
+      const res = await fetch('/api/inventory');
+      const items = await res.json();
+      const files = await Promise.all(
+        items.map(async (item) => {
+          const r = await fetch(item.url);
+          const blob = await r.blob();
+          return new File([blob], item.name, { type: item.type });
+        })
+      );
+      setGroups((prev) => [...prev, { name: 'Inventory', media: files }]);
+      setSelectedGroupIdx(groups.length);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load inventory');
+    }
+  };
+
 
   const next = () => {
     if (!currentGroup.media.length) return;
@@ -256,6 +275,7 @@ function App() {
           style={{ fontSize: 16, padding: 4 }}
         />
         <button onClick={addGroup}>Add Group</button>
+        <button onClick={loadInventory}>Load Inventory</button>
       </div>
       {/* Rename dialog */}
       {renaming && (

@@ -193,7 +193,7 @@ function App() {
     const file = currentGroup.media[currentIdx];
     if (!file) return <div style={{color:'#888'}}>No media selected</div>;
     if (is360Image(file)) {
-      return <div ref={viewerRef} style={{ width: "100%", height: "60vh" }} />;
+      return <div ref={viewerRef} style={{ width: "200%", height: "100vh" }} />;
     }
     if (isVideo(file)) {
       return (
@@ -236,11 +236,11 @@ function App() {
       <div className="app-container">
         <h1>Firestick Slideshow</h1>
       {/* Group selection and management */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ marginBottom: 15, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <select
           value={selectedGroupIdx}
           onChange={e => selectGroup(Number(e.target.value))}
-          style={{ fontSize: 18, padding: 4 }}
+          style={{ fontSize: 16, padding: 2 }}
         >
           {groups.map((g, idx) => (
             <option key={idx} value={idx}>{g.name}</option>

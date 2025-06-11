@@ -43,8 +43,8 @@ function Billboard({ media }) {
   }, [media]);
 
   return (
-    <mesh ref={meshRef} position={[0, 2, 0]}>
-      <planeGeometry args={[4, 2.25]} />
+    <mesh ref={meshRef} position={[0, -0.5, 0]}>
+      <planeGeometry args={[5, 5.25]} />
       {texture && <meshBasicMaterial attach="material" map={texture} toneMapped={false} />}
       {!texture && (
         <meshBasicMaterial attach="material" color="#222" />
@@ -55,11 +55,11 @@ function Billboard({ media }) {
 
 export default function BillboardScene({ media }) {
   return (
-    <Canvas camera={{ position: [0, 2, 7], fov: 50 }} style={{ width: "100%", height: "60vh", background: "#222" }}>
+    <Canvas camera={{ position: [0, 2, 7], fov: 50 }} style={{ width: "900%", height: "90vh", background: "#222" }}>
       {/* Ground */}
-      <ambientLight intensity={0.7} />
+      <ambientLight intensity={0.9} />
       <directionalLight position={[5, 10, 7]} intensity={1} />
-      <mesh position={[0, 0, 0]} receiveShadow>
+      <mesh position={[0, 0, 1]} receiveShadow>
         <boxGeometry args={[20, 0.1, 20]} />
         <meshStandardMaterial color="#444" />
       </mesh>

@@ -1,6 +1,6 @@
 body {
-  background: #181818;
-  color: #fff;
+  background: lab(28.46% 2.12 0.76);
+  color: hwb(253 4% 6%);
   font-family: sans-serif;
   margin: 0;
   padding: 0;
@@ -18,19 +18,19 @@ body::before {
 
 .bentley-logo-overlay {
   position: fixed;
-  top: 24px;
-  left: 24px;
-  width: 160px;
+  top: 500px;
+  left: 100px;
+  width: 700px;
   height: auto;
   z-index: 10;
-  opacity: 0;
-  animation: logo-fadein 1.5s ease 0.5s forwards;
-  filter: drop-shadow(0 2px 8px #111);
+  opacity: -5.5;
+  animation: logo-fadein 30.5s ease 1.5s forwards;
+  filter: drop-shadow(-5px 5px 5px #111);
   pointer-events: none;
 }
 
 @keyframes logo-fadein {
-  to { opacity: 1; }
+  to { opacity: 0.5; }
 }
 
 
@@ -54,9 +54,9 @@ body::before {
 }
 
 .media-viewer {
-  width: 90vw;
-  max-width: 1280px;
-  height: 60vh;
+  width: 600vw;
+  max-width: 2280px;
+  height: 100vh;
   background: #222;
   display: flex;
   align-items: center;

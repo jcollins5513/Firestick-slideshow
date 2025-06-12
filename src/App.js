@@ -32,7 +32,10 @@ function App() {
 
   // Add files to current group
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files).map(f => {
+      f.userMarked360 = false;
+      return f;
+    });
     if (!files.length) return;
     setGroups((prev) => {
       const updated = [...prev];
@@ -109,6 +112,23 @@ function App() {
     setRenaming(false);
   };
 
+  const toggleCurrentMark360 = () => {
+    setGroups((prev) => {
+      const updated = [...prev];
+      const group = { ...updated[selectedGroupIdx] };
+      const media = [...group.media];
+      if (!media[currentIdx]) return prev;
+      media[currentIdx].userMarked360 = !media[currentIdx].userMarked360;
+      group.media = media;
+      updated[selectedGroupIdx] = group;
+      return updated;
+    });
+    if (psv) {
+      psv.destroy();
+      setPsv(null);
+    }
+  };
+  
   const loadInventory = async () => {
     try {
       const res = await fetch('/api/inventory');
@@ -327,6 +347,15 @@ function App() {
         {currentGroup.media.length > 0 && (
           <>
             {currentIdx + 1} / {currentGroup.media.length} : {currentGroup.media[currentIdx].name}
+            <label style={{ marginLeft: 10 }}>
+              <input
+                type="checkbox"
+                checked={!!currentGroup.media[currentIdx].userMarked360}
+                onChange={toggleCurrentMark360}
+                style={{ marginRight: 4 }}
+              />
+              360°
+            </label>
           </>
         )}
       </div>

@@ -8,9 +8,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-
-    "start-server": "node server/index.js"
-
+    "server": "node server.js"
     "test:ci": "react-scripts test --watchAll=false"
 
   },
@@ -22,10 +20,13 @@
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
     "three": "^0.150.1",
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
+
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
     "redis": "^4.6.7",
-    "pg": "^8.11.5"
+    "dotenv": "^16.3.1"
+    "cors": "^2.8.5",
+
   },
   "browserslist": {
     "production": [

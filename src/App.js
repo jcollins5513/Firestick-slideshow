@@ -52,6 +52,8 @@ function App() {
       psv.destroy();
       setPsv(null);
     }
+    // Reset input so selecting the same file triggers onChange again
+    e.target.value = "";
   };
 
   // Add a new group

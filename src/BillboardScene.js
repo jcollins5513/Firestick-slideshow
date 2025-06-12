@@ -24,7 +24,7 @@ function Billboard({ media }) {
       video.src = media.url || URL.createObjectURL(media);
       video.crossOrigin = "anonymous";
       video.loop = true;
-      video.muted = true;
+      video.muted = false;
       video.autoplay = true;
       video.playsInline = true;
       video.play();

@@ -4,6 +4,7 @@ const { createClient } = require('redis');
 require('dotenv').config();
 
 const app = express();
+app.use(express.static('public'));
 const port = process.env.PORT || 3001;
 
 async function fetchFromPostgres() {

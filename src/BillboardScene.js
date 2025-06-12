@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useLoader } from "@react-three/fiber";
-import { TextureLoader, VideoTexture, MeshBasicMaterial, PlaneGeometry, Mesh } from "three";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { TextureLoader, VideoTexture } from "three";
 
 function Billboard({ media }) {
   const meshRef = useRef();
@@ -45,7 +46,7 @@ function Billboard({ media }) {
   }, [media]);
 
   return (
-    <mesh ref={meshRef} position={[0, -0.5, 0]}>
+    <mesh ref={meshRef} position={[0, 1.5, -2]}>
       <planeGeometry args={[5, 5.25]} />
       {texture && <meshBasicMaterial attach="material" map={texture} toneMapped={false} />}
       {!texture && (
@@ -56,17 +57,33 @@ function Billboard({ media }) {
 }
 
 export default function BillboardScene({ media }) {
+  const [gltf, setGltf] = React.useState(null);
+  useEffect(() => {
+    const loader = new GLTFLoader();
+    loader.load(
+      "/dealership.glb",
+      (loaded) => setGltf(loaded),
+      undefined,
+      (err) => {
+        console.warn("dealership.glb not found", err);
+        setGltf(null);
+      }
+    );
+  }, []);
   return (
     <Canvas camera={{ position: [0, 2, 7], fov: 50 }} style={{ width: "900%", height: "90vh", background: "#222" }}>
-      {/* Ground */}
       <ambientLight intensity={0.9} />
       <directionalLight position={[5, 10, 7]} intensity={1} />
+      {/* Ground */}
       <mesh position={[0, 0, 1]} receiveShadow>
         <boxGeometry args={[20, 0.1, 20]} />
         <meshStandardMaterial color="#444" />
       </mesh>
-      {/* Billboard */}
+      {/* 3D dealership model */}
+      {gltf && <primitive object={gltf.scene} position={[0, 0, 0]} scale={1} />}
+      {/* Billboard plane positioned roughly where the screen is */}
       <Billboard media={media} />
+      <OrbitControls />
     </Canvas>
   );
 }

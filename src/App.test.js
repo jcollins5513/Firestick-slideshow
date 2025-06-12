@@ -2,6 +2,14 @@ import "@testing-library/jest-dom";
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
+jest.mock('three/examples/jsm/loaders/GLTFLoader', () => ({
+  GLTFLoader: class {
+    load(_url, onLoad) {
+      onLoad({ scene: { traverse: jest.fn() } });
+    }
+  }
+}));
+
 beforeAll(() => {
   // Mock browser APIs used by three.js and react-use-measure
   window.ResizeObserver = class {
@@ -40,8 +48,8 @@ beforeAll(() => {
   window.PhotoSphereViewer = { Viewer: jest.fn(() => ({ destroy: jest.fn(), setPanorama: jest.fn() })) };
 });
 
-test('renders Firestick Slideshow heading', () => {
+test('renders Firestick Slideshow heading', async () => {
   render(<App />);
-  const heading = screen.getByText(/Firestick Slideshow/i);
+  const heading = await screen.findByText(/Firestick Slideshow/i);
   expect(heading).toBeInTheDocument();
 });

@@ -4,9 +4,15 @@ export const is360Image = (file) => {
 };
 
 export const isVideo = (file) => {
-  return !!(file && file.type && file.type.startsWith('video/'));
+  if (!file) return false;
+  if (file.type) return file.type.startsWith('video/');
+  if (file.name) return /\.(mp4|webm|mov|m4v|hevc)$/i.test(file.name);
+  return false;
 };
 
 export const isImage = (file) => {
-  return !!(file && file.type && file.type.startsWith('image/'));
+  if (!file) return false;
+  if (file.type) return file.type.startsWith('image/');
+  if (file.name) return /\.(jpg|jpeg|png|gif|bmp|heic|heif|avif)$/i.test(file.name);
+  return false;
 };

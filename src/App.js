@@ -1,19 +1,7 @@
 import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 import BillboardScene from "./BillboardScene";
-
-const is360Image = (file) => {
-  // Heuristic: filename contains '360' or 'pano', or user marks it
-  return file && file.name && /360|pano/i.test(file.name);
-};
-
-const isVideo = (file) => {
-  return file && file.type && file.type.startsWith("video/");
-};
-
-const isImage = (file) => {
-  return file && file.type && file.type.startsWith("image/");
-};
+import { is360Image, isVideo, isImage } from "./mediaUtils";
 
 function App() {
   // Groups: [{ name: string, media: [File, ...] }]

@@ -1,20 +1,7 @@
 import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 import BillboardScene from "./BillboardScene";
-
-const is360Image = (file) => {
-  // Heuristic: filename contains '360' or 'pano', or user marks it
-  if (!file) return false;
-  return file.userMarked360 || (file.name && /360|pano/i.test(file.name));
-};
-
-const isVideo = (file) => {
-  return file && file.type && file.type.startsWith("video/");
-};
-
-const isImage = (file) => {
-  return file && file.type && file.type.startsWith("image/");
-};
+import { is360Image, isVideo, isImage } from "./mediaUtils";
 
 function App() {
   // Groups: [{ name: string, media: [File, ...] }]
@@ -139,6 +126,25 @@ function App() {
     if (psv) {
       psv.destroy();
       setPsv(null);
+    }
+  };
+  
+  const loadInventory = async () => {
+    try {
+      const res = await fetch('/api/inventory');
+      const items = await res.json();
+      const files = await Promise.all(
+        items.map(async (item) => {
+          const r = await fetch(item.url);
+          const blob = await r.blob();
+          return new File([blob], item.name, { type: item.type });
+        })
+      );
+      setGroups((prev) => [...prev, { name: 'Inventory', media: files }]);
+      setSelectedGroupIdx(groups.length);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load inventory');
     }
   };
 
@@ -277,6 +283,7 @@ function App() {
           style={{ fontSize: 16, padding: 4 }}
         />
         <button onClick={addGroup}>Add Group</button>
+        <button onClick={loadInventory}>Load Inventory</button>
       </div>
       {/* Rename dialog */}
       {renaming && (

@@ -19,7 +19,12 @@ A browser-based slideshow app for Firestick and other smart TVs. Supports:
 ## Local Development
 ```sh
 npm install
+npm run server &
 npm start
 ```
+
+The server reads `NEON_DB_URL` or `REDIS_URL` from a `.env` file to load
+inventory data. The React app fetches `/inventory` on startup and uses the
+returned list of `{name, url, type}` records as a slideshow group.
 
 ---

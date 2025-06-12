@@ -12,13 +12,15 @@ function Billboard({ media }) {
   useEffect(() => {
     if (!media) return;
     if (media.type && media.type.startsWith("image/")) {
-      const url = URL.createObjectURL(media);
-      const tex = new TextureLoader().load(url, () => URL.revokeObjectURL(url));
+      const url = media.url || URL.createObjectURL(media);
+      const tex = new TextureLoader().load(url, () => {
+        if (!media.url) URL.revokeObjectURL(url);
+      });
       setTexture(tex);
       setVideoEl(null);
     } else if (media.type && media.type.startsWith("video/")) {
       const video = document.createElement("video");
-      video.src = URL.createObjectURL(media);
+      video.src = media.url || URL.createObjectURL(media);
       video.crossOrigin = "anonymous";
       video.loop = true;
       video.muted = true;
@@ -36,7 +38,7 @@ function Billboard({ media }) {
     return () => {
       if (videoEl) {
         videoEl.pause();
-        URL.revokeObjectURL(videoEl.src);
+        if (!media.url) URL.revokeObjectURL(videoEl.src);
       }
     };
     // eslint-disable-next-line

@@ -2,17 +2,29 @@ import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 import BillboardScene from "./BillboardScene";
 
+const getExtType = (url) => {
+  if (/\.(mp4|webm|mov)$/i.test(url)) return 'video';
+  if (/\.(jpg|jpeg|png|gif|bmp)$/i.test(url)) return 'image';
+  return '';
+};
+
 const is360Image = (file) => {
-  // Heuristic: filename contains '360' or 'pano', or user marks it
-  return file && file.name && /360|pano/i.test(file.name);
+  const name = file && (file.name || file.url);
+  return name && /360|pano/i.test(name);
 };
 
 const isVideo = (file) => {
-  return file && file.type && file.type.startsWith("video/");
+  if (!file) return false;
+  if (file.type) return file.type.startsWith('video/');
+  if (file.url) return getExtType(file.url) === 'video';
+  return false;
 };
 
 const isImage = (file) => {
-  return file && file.type && file.type.startsWith("image/");
+  if (!file) return false;
+  if (file.type) return file.type.startsWith('image/');
+  if (file.url) return getExtType(file.url) === 'image';
+  return false;
 };
 
 function App() {
@@ -31,6 +43,23 @@ function App() {
   const [newGroupName, setNewGroupName] = useState("");
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+
+  // Load inventory from the API on startup
+  React.useEffect(() => {
+    fetch('/inventory')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length) {
+          const media = data.map(item => ({
+            name: item.name || item.url,
+            url: item.url,
+            type: item.type
+          }));
+          setGroups(prev => [{ name: 'Inventory', media }, ...prev]);
+        }
+      })
+      .catch(err => console.error('Failed to load inventory', err));
+  }, []);
 
   // Persist groups
   React.useEffect(() => {
@@ -170,7 +199,7 @@ function App() {
       viewerRef.current
     ) {
       const file = currentGroup.media[currentIdx];
-      const url = URL.createObjectURL(file);
+      const url = file.url || URL.createObjectURL(file);
       if (psv) {
         psv.setPanorama(url);
       } else {
@@ -184,7 +213,9 @@ function App() {
           })
         );
       }
-      return () => URL.revokeObjectURL(url);
+      return () => {
+        if (!file.url) URL.revokeObjectURL(url);
+      };
     }
   }, [currentIdx, currentGroup.media]);
 
@@ -196,10 +227,11 @@ function App() {
       return <div ref={viewerRef} style={{ width: "200%", height: "100vh" }} />;
     }
     if (isVideo(file)) {
+      const src = file.url || URL.createObjectURL(file);
       return (
         <video
           ref={videoRef}
-          src={URL.createObjectURL(file)}
+          src={src}
           controls
           autoPlay={playing}
           style={{ width: "100%", height: "60vh", objectFit: "contain" }}
@@ -207,9 +239,10 @@ function App() {
       );
     }
     if (isImage(file)) {
+      const src = file.url || URL.createObjectURL(file);
       return (
         <img
-          src={URL.createObjectURL(file)}
+          src={src}
           alt={file.name}
           style={{ width: "100%", height: "60vh", objectFit: "contain" }}
         />

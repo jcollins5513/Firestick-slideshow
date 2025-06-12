@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 import BillboardScene from "./BillboardScene";
+import { is360Image, isVideo, isImage } from "./mediaUtils";
 
 const getExtType = (url) => {
   if (/\.(mp4|webm|mov)$/i.test(url)) return 'video';
@@ -73,7 +74,10 @@ function App() {
 
   // Add files to current group
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files).map(f => {
+      f.userMarked360 = false;
+      return f;
+    });
     if (!files.length) return;
     setGroups((prev) => {
       const updated = [...prev];
@@ -90,6 +94,8 @@ function App() {
       psv.destroy();
       setPsv(null);
     }
+    // Reset input so selecting the same file triggers onChange again
+    e.target.value = "";
   };
 
   // Add a new group
@@ -148,6 +154,42 @@ function App() {
       return updated;
     });
     setRenaming(false);
+  };
+
+  const toggleCurrentMark360 = () => {
+    setGroups((prev) => {
+      const updated = [...prev];
+      const group = { ...updated[selectedGroupIdx] };
+      const media = [...group.media];
+      if (!media[currentIdx]) return prev;
+      media[currentIdx].userMarked360 = !media[currentIdx].userMarked360;
+      group.media = media;
+      updated[selectedGroupIdx] = group;
+      return updated;
+    });
+    if (psv) {
+      psv.destroy();
+      setPsv(null);
+    }
+  };
+  
+  const loadInventory = async () => {
+    try {
+      const res = await fetch('/api/inventory');
+      const items = await res.json();
+      const files = await Promise.all(
+        items.map(async (item) => {
+          const r = await fetch(item.url);
+          const blob = await r.blob();
+          return new File([blob], item.name, { type: item.type });
+        })
+      );
+      setGroups((prev) => [...prev, { name: 'Inventory', media: files }]);
+      setSelectedGroupIdx(groups.length);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load inventory');
+    }
   };
 
 
@@ -289,6 +331,7 @@ function App() {
           style={{ fontSize: 16, padding: 4 }}
         />
         <button onClick={addGroup}>Add Group</button>
+        <button onClick={loadInventory}>Load Inventory</button>
       </div>
       {/* Rename dialog */}
       {renaming && (
@@ -352,6 +395,15 @@ function App() {
         {currentGroup.media.length > 0 && (
           <>
             {currentIdx + 1} / {currentGroup.media.length} : {currentGroup.media[currentIdx].name}
+            <label style={{ marginLeft: 10 }}>
+              <input
+                type="checkbox"
+                checked={!!currentGroup.media[currentIdx].userMarked360}
+                onChange={toggleCurrentMark360}
+                style={{ marginRight: 4 }}
+              />
+              360°
+            </label>
           </>
         )}
       </div>

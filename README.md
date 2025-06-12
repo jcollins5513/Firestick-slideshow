@@ -16,6 +16,7 @@ A browser-based slideshow app for Firestick and other smart TVs. Supports:
 1. Open the app in your Firestick or TV browser (Silk, Firefox, etc).
 2. Use the file picker to select images/videos.
 3. Use remote or keyboard to navigate the slideshow.
+4. (Optional) Copy your dealership GLB/GLTF model to `public/dealership.glb` so it renders behind the billboard screen.
 
 ## Local Development
 ```sh

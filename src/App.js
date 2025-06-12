@@ -1,11 +1,10 @@
 import React, { useRef, useState } from "react";
 import { ReactComponent as BentleyLogo } from "./assets/bentley-logo.svg";
 import BillboardScene from "./BillboardScene";
-import { is360Image, isVideo, isImage } from "./mediaUtils";
 
 const getExtType = (url) => {
-  if (/\.(mp4|webm|mov)$/i.test(url)) return 'video';
-  if (/\.(jpg|jpeg|png|gif|bmp)$/i.test(url)) return 'image';
+  if (/\.(mp4|webm|mov|m4v|hevc)$/i.test(url)) return 'video';
+  if (/\.(jpg|jpeg|png|gif|bmp|heic|heif|avif)$/i.test(url)) return 'image';
   return '';
 };
 
@@ -18,6 +17,7 @@ const isVideo = (file) => {
   if (!file) return false;
   if (file.type) return file.type.startsWith('video/');
   if (file.url) return getExtType(file.url) === 'video';
+  if (file.name) return /\.(mp4|webm|mov|m4v|hevc)$/i.test(file.name);
   return false;
 };
 
@@ -25,6 +25,7 @@ const isImage = (file) => {
   if (!file) return false;
   if (file.type) return file.type.startsWith('image/');
   if (file.url) return getExtType(file.url) === 'image';
+  if (file.name) return /\.(jpg|jpeg|png|gif|bmp|heic|heif|avif)$/i.test(file.name);
   return false;
 };
 

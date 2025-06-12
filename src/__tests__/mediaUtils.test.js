@@ -29,6 +29,10 @@ describe('mediaUtils helpers', () => {
       expect(isVideo({ type: 'video/mp4' })).toBe(true);
     });
 
+    it('detects common video extensions when type missing', () => {
+      expect(isVideo({ name: 'clip.hevc' })).toBe(true);
+    });
+
     it('returns false for non video mime types', () => {
       expect(isVideo({ type: 'image/png' })).toBe(false);
     });
@@ -43,6 +47,11 @@ describe('mediaUtils helpers', () => {
     it('returns true for image mime types', () => {
       expect(isImage({ type: 'image/jpeg' })).toBe(true);
       expect(isImage({ type: 'image/png' })).toBe(true);
+    });
+
+    it('detects additional image extensions when type missing', () => {
+      expect(isImage({ name: 'photo.heic' })).toBe(true);
+      expect(isImage({ name: 'picture.avif' })).toBe(true);
     });
 
     it('returns false for non image mime types', () => {

@@ -176,19 +176,47 @@ function App() {
   
   const loadInventory = async () => {
     try {
+      console.log('Fetching /api/inventory...');
       const res = await fetch('/api/inventory');
+      console.log('Response from /api/inventory:', res);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const items = await res.json();
+      console.log('Received inventory items:', items);
+
+      if (!Array.isArray(items)) {
+        throw new Error('Inventory data is not an array');
+      }
+
       const files = await Promise.all(
         items.map(async (item) => {
-          const r = await fetch(item.url);
-          const blob = await r.blob();
-          return new File([blob], item.name, { type: item.type });
+          try {
+            console.log(`Fetching item.url: ${item.url}`);
+            const r = await fetch(item.url);
+            if (!r.ok) {
+              throw new Error(`Failed to fetch ${item.url}, status: ${r.status}`);
+            }
+            const blob = await r.blob();
+            return new File([blob], item.name, { type: item.type });
+          } catch (err) {
+            console.error(`Failed to process item: ${item.name}`, item, err);
+            // Return null or some indicator of failure
+            return null;
+          }
         })
       );
-      setGroups((prev) => [...prev, { name: 'Inventory', media: files }]);
+      
+      // Filter out any items that failed to load
+      const validFiles = files.filter(file => file !== null);
+
+      console.log('Successfully loaded files:', validFiles);
+      setGroups((prev) => [...prev, { name: 'Inventory', media: validFiles }]);
       setSelectedGroupIdx(groups.length);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to load inventory', err);
       alert('Failed to load inventory');
     }
   };
